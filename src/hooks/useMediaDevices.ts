@@ -2,17 +2,20 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { DeviceType } from "~types/enums";
 
 type Props = {
-  devices?: MediaDeviceInfo[];
-  getStreamAsync: (device: MediaDeviceInfo) => Promise<MediaStream>;
+  cameraDevices?: MediaDeviceInfo[];
+  getCameraStreamAsync: (device: MediaDeviceInfo) => Promise<MediaStream>;
+  getScreenStreamAsync: () => Promise<MediaStream>;
 };
 
 const useMediaDevices = (): Props => {
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>();
+  const [cameraDevices, setCameraDevices] = useState<MediaDeviceInfo[]>();
+  const [screenDevices, setScreenDevices] = useState<MediaDeviceInfo[]>();
 
-  const getStreamAsync = useCallback(
+  const getCameraStreamAsync = useCallback(
     async (device: MediaDeviceInfo): Promise<MediaStream> => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
           peerIdentity: device.deviceId,
         });
         console.log("Got MediaStream:", stream);
@@ -24,6 +27,24 @@ const useMediaDevices = (): Props => {
     []
   );
 
+  const getScreenStreamAsync = useCallback(async (): Promise<MediaStream> => {
+    let captureStream: MediaStream | undefined = undefined;
+    try {
+      // This is a missalignment with TypeScript where getDisplayMedia is not defined on mediaDevices
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mediaDevices = navigator.mediaDevices as any;
+      captureStream = await mediaDevices.getDisplayMedia({
+        video: {
+          cursor: "always",
+          mandatory: { maxHeight: 1440, maxWidth: 3440 },
+        },
+      });
+    } catch (err) {
+      console.error("Error: " + err);
+    }
+    return captureStream;
+  }, []);
+
   const getConnectedDevices = useCallback(async (type: DeviceType): Promise<
     MediaDeviceInfo[]
   > => {
@@ -32,15 +53,25 @@ const useMediaDevices = (): Props => {
   }, []);
 
   useEffect(() => {
-    getConnectedDevices(DeviceType.VideoInput).then(setDevices);
+    getConnectedDevices(DeviceType.VideoInput).then(setCameraDevices);
   }, [getConnectedDevices]);
+
+  useEffect(() => {
+    const callback = () => {
+      getConnectedDevices(DeviceType.VideoInput).then(setCameraDevices);
+    };
+    navigator.mediaDevices.addEventListener("devicechange", callback);
+    return () =>
+      navigator.mediaDevices.removeEventListener("devicechange", callback);
+  });
 
   const props = useMemo<Props>(
     () => ({
-      devices,
-      getStreamAsync,
+      cameraDevices,
+      getCameraStreamAsync,
+      getScreenStreamAsync,
     }),
-    [devices, getStreamAsync]
+    [cameraDevices, getCameraStreamAsync, getScreenStreamAsync]
   );
 
   return props;
