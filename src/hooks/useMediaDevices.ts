@@ -1,15 +1,12 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { DeviceType } from "~types/enums";
 
 type Props = {
   devices?: MediaDeviceInfo[];
   getStreamAsync: (device: MediaDeviceInfo) => Promise<MediaStream>;
 };
 
-enum DeviceType {
-  VideoInput = "videoinput",
-}
-
-const useMediaDevices = () => {
+const useMediaDevices = (): Props => {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>();
 
   const getStreamAsync = useCallback(
@@ -34,6 +31,10 @@ const useMediaDevices = () => {
     return devices.filter((device) => device.kind === type);
   }, []);
 
+  useEffect(() => {
+    getConnectedDevices(DeviceType.VideoInput).then(setDevices);
+  }, [getConnectedDevices]);
+
   const props = useMemo<Props>(
     () => ({
       devices,
@@ -44,3 +45,4 @@ const useMediaDevices = () => {
 
   return props;
 };
+export default useMediaDevices;
