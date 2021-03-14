@@ -3,9 +3,10 @@ import "./video.scss";
 
 type Props = {
   stream: MediaStream | undefined;
+  isPreview?: boolean;
 };
 
-const Video: React.FC<Props> = ({ stream }: Props) => {
+const Video: React.FC<Props> = ({ stream, isPreview }: Props) => {
   const ref = useRef<HTMLVideoElement>();
 
   useEffect(() => {
@@ -15,7 +16,7 @@ const Video: React.FC<Props> = ({ stream }: Props) => {
   }, [stream, ref]);
   return (
     <video
-      className="video-container"
+      className={isPreview ? "preview video-container" : "video-container"}
       ref={ref}
       autoPlay
       playsInline

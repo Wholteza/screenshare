@@ -9,7 +9,6 @@ type Props = {
 
 const useMediaDevices = (): Props => {
   const [cameraDevices, setCameraDevices] = useState<MediaDeviceInfo[]>();
-  const [screenDevices, setScreenDevices] = useState<MediaDeviceInfo[]>();
 
   const getCameraStreamAsync = useCallback(
     async (device: MediaDeviceInfo): Promise<MediaStream> => {

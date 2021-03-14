@@ -1,38 +1,34 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import Video from "~elements/video";
 import useMediaDevices from "~hooks/useMediaDevices";
+import "./root.scss";
 
 const Root: React.FC = () => {
-  const {
-    cameraDevices,
-    getCameraStreamAsync,
-    getScreenStreamAsync,
-  } = useMediaDevices();
-  const [cameraStream, setCameraStream] = useState<MediaStream>();
+  const { getScreenStreamAsync } = useMediaDevices();
   const [screenStream, setScreenStream] = useState<MediaStream>();
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (!cameraDevices || cameraDevices?.length === 0) return;
-    getCameraStreamAsync(cameraDevices[0]).then(setCameraStream);
-  }, [cameraDevices, getCameraStreamAsync]);
-
-  useEffect(() => {
+  const toggleStreaming = useCallback(() => {
+    if (screenStream) {
+      screenStream.getTracks().forEach((track) => track.stop());
+      setScreenStream(undefined);
+      return;
+    }
     getScreenStreamAsync().then(setScreenStream);
-  }, [getScreenStreamAsync]);
+  }, [getScreenStreamAsync, screenStream]);
 
-  const deviceInfo = useMemo<JSX.Element>(
-    () => (
-      <div>
-        {cameraDevices?.map((device) => device && JSON.stringify(device)) ||
-          "no devices"}
-      </div>
-    ),
-    [cameraDevices]
-  );
+  const togglePreview = useCallback(() => setShowPreview((prev) => !prev), []);
   return (
-    <>
-      <Video stream={screenStream} />
-    </>
+    <div className="root-container">
+      <div className="status-container"></div>
+      <div className="controls-container">
+        <button onClick={toggleStreaming}>
+          {screenStream ? "Stop streaming" : "Start streaming"}
+        </button>
+        <button onClick={togglePreview}>Toggle preview</button>
+      </div>
+      {showPreview && <Video stream={screenStream} isPreview />}
+    </div>
   );
 };
 
