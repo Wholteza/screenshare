@@ -35,7 +35,8 @@ const useMediaDevices = (): Props => {
       captureStream = await mediaDevices.getDisplayMedia({
         video: {
           cursor: "always",
-          mandatory: { maxHeight: 1440, maxWidth: 3440 },
+          width: { max: 3440 },
+          height: { max: 1440 },
         },
       });
     } catch (err) {
