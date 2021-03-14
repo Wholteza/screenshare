@@ -25,7 +25,7 @@ const usePeer = (stream: MediaStream | undefined): Props => {
     });
     // const newPeer = new Peer({
     //   debug: 3,
-    //   host: "azure-address",
+    //   host: "server-address",
     //   path: "/peerjs",
     //   secure: true,
     // });

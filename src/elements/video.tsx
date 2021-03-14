@@ -20,7 +20,7 @@ const Video: React.FC<Props> = ({ stream, isPreview }: Props) => {
       ref={ref}
       autoPlay
       playsInline
-      controls={false}
+      controls
     ></video>
   );
 };

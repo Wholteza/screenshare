@@ -16,6 +16,7 @@ const useMediaDevices = (): Props => {
           cursor: "always",
           width: { max: 3440 },
           height: { max: 1440 },
+          frameRate: { max: 144 },
         },
       });
     } catch (err) {
