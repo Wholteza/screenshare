@@ -23,6 +23,12 @@ const usePeer = (stream: MediaStream | undefined): Props => {
       port: 9000,
       path: "/peerjs",
     });
+    // const newPeer = new Peer({
+    //   debug: 3,
+    //   host: "azure-address",
+    //   path: "/peerjs",
+    //   secure: true,
+    // });
     newPeer.on("open", function (id) {
       console.log("My peer ID is: " + id);
       setId(id);
