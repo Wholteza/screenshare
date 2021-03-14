@@ -1,5 +1,7 @@
 {
   "eslint.options": {
     "configFile": ".eslintrc.json"
-  }
+  },
+  "appService.defaultWebAppToDeploy": "/subscriptions/8ad5faea-7860-45d5-b757-1b52875f8e21/resourceGroups/puckoo/providers/Microsoft.Web/sites/puckoo-signaling",
+  "appService.deploySubpath": "."
 }

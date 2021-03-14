@@ -17,8 +17,5 @@
   },
   "dependencies": {
     "peer": "0.6.1"
-  },
-  "bundledDependencies": [
-    "peer"
-  ]
+  }
 }
