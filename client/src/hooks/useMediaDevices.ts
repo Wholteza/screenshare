@@ -1,31 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { DeviceType } from "~types/enums";
+import { useCallback, useMemo } from "react";
 
 type Props = {
-  cameraDevices?: MediaDeviceInfo[];
-  getCameraStreamAsync: (device: MediaDeviceInfo) => Promise<MediaStream>;
   getScreenStreamAsync: () => Promise<MediaStream>;
 };
 
 const useMediaDevices = (): Props => {
-  const [cameraDevices, setCameraDevices] = useState<MediaDeviceInfo[]>();
-
-  const getCameraStreamAsync = useCallback(
-    async (device: MediaDeviceInfo): Promise<MediaStream> => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          peerIdentity: device.deviceId,
-        });
-        console.log("Got MediaStream:", stream);
-        return stream;
-      } catch (error) {
-        console.error("Error accessing media devices.", error);
-      }
-    },
-    []
-  );
-
   const getScreenStreamAsync = useCallback(async (): Promise<MediaStream> => {
     let captureStream: MediaStream | undefined = undefined;
     try {
@@ -45,33 +24,11 @@ const useMediaDevices = (): Props => {
     return captureStream;
   }, []);
 
-  const getConnectedDevices = useCallback(async (type: DeviceType): Promise<
-    MediaDeviceInfo[]
-  > => {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    return devices.filter((device) => device.kind === type);
-  }, []);
-
-  useEffect(() => {
-    getConnectedDevices(DeviceType.VideoInput).then(setCameraDevices);
-  }, [getConnectedDevices]);
-
-  useEffect(() => {
-    const callback = () => {
-      getConnectedDevices(DeviceType.VideoInput).then(setCameraDevices);
-    };
-    navigator.mediaDevices.addEventListener("devicechange", callback);
-    return () =>
-      navigator.mediaDevices.removeEventListener("devicechange", callback);
-  });
-
   const props = useMemo<Props>(
     () => ({
-      cameraDevices,
-      getCameraStreamAsync,
       getScreenStreamAsync,
     }),
-    [cameraDevices, getCameraStreamAsync, getScreenStreamAsync]
+    [getScreenStreamAsync]
   );
 
   return props;
